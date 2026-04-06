@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuraChat — AI Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../static/styles/style.css" />
+</head>
+<body>
+
+  <div class="chat-layout">
+
+    <!-- ======================================================
+         SIDEBAR
+         ====================================================== -->
+    <aside id="sidebar" class="sidebar collapsed">
+
+      <!-- Top toggle button -->
+      <div class="sidebar-top">
+        <button id="sidebarToggle" class="toggle-btn" title="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+
+        <!-- New Chat -->
+        <div class="nav-item active" onclick="ChatUI.elements.emptyState() && location.reload()">
+          <span class="nav-icon"><i class="bi bi-plus-square"></i></span>
+          <span class="nav-label">New Chat</span>
+        </div>
+
+        <!-- Section: Recent Chats -->
+        <div class="nav-section-title">Recent Chats</div>
+
+        <!-- History items populated by JS -->
+        <div id="chatHistoryList"></div>
+
+      </nav>
+
+      <!-- Bottom user profile -->
+      <div class="sidebar-bottom">
+        <div class="user-profile">
+          <div class="avatar-placeholder" id="userInitials">S</div>
+          <div class="user-info">
+            <div class="user-name" id="displayUsername">User</div>
+            <div class="user-status">Welcome back,</div>
+          </div>
+        </div>
+
+        <!-- Logout button -->
+        <div
+          id="logoutBtn"
+          class="nav-item"
+          style="margin-top:6px; color:#ef4444;"
+          title="Logout"
+        >
+          <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
+          <span class="nav-label">Logout</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ======================================================
+         MAIN CHAT AREA
+         ====================================================== -->
+    <main class="chat-main">
+
+      <!-- Header -->
+      <header class="chat-header">
+        <div class="chat-header-left">
+          <div class="bot-avatar-header">🤖</div>
+          <div>
+            <h1>NeuraChat</h1>
+            <div class="status-badge">
+              <span class="status-dot"></span> Online
+            </div>
+          </div>
+        </div>
+        <div class="chat-header-right">
+          <div class="search-box">
+            <i class="bi bi-search"></i>
+            <span>Search</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Messages area -->
+      <section class="messages-area" id="messagesArea">
+
+        <!-- Empty / Welcome state -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🤖</div>
+          <h3>How can I help you today?</h3>
+          <p>Ask me anything — I'm here to assist.</p>
+          <div class="suggestion-chips">
+            <div class="chip">Rephrase something for me</div>
+            <div class="chip">Summarize a document</div>
+            <div class="chip">Help me write an email</div>
+            <div class="chip">Explain a concept</div>
+          </div>
+        </div>
+
+        <!-- Typing indicator (hidden by default) -->
+        <div class="message-row bot" id="typingRow" style="display:none;">
+          <div class="msg-avatar bot-av">🤖</div>
+          <div class="bubble-wrap">
+            <div class="bubble bot">
+              <div class="typing-bubble">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Input bar -->
+      <footer class="chat-input-bar">
+        <div class="input-container">
+          <!-- Attach button (placeholder for future file upload) -->
+          <button class="input-action-btn" title="Attach file" onclick="showToast('File upload coming soon!', 'info')">
+            <i class="bi bi-paperclip"></i>
+          </button>
+
+          <!-- Message textarea -->
+          <textarea
+            id="messageInput"
+            placeholder="Type a new message here"
+            rows="1"
+            autocomplete="off"
+          ></textarea>
+
+          <!-- Emoji button (placeholder) -->
+          <button class="input-action-btn" title="Emoji" onclick="showToast('Emoji picker coming soon!', 'info')">
+            <i class="bi bi-emoji-smile"></i>
+          </button>
+
+          <!-- Send button -->
+          <button id="sendBtn" class="send-btn" title="Send message">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <div class="toast-container"></div>
+  <script src="../scripts/app.js"></script>
+</body>
+</html>
