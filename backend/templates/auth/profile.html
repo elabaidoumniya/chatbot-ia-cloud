@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Profil — NeuralChat{% endblock %}
+{% block body_class %}chat-page{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    <a href="{{ url_for('chat.index') }}" class="back-link">← Retour au chat</a>
+    <div class="profile-card">
+        <div class="profile-avatar large" style="background: {{ current_user.avatar_color }}">
+            {{ current_user.username[0].upper() }}
+        </div>
+        <h1>{{ current_user.username }}</h1>
+        <p class="profile-email">{{ current_user.email }}</p>
+        <p class="profile-date">Membre depuis {{ current_user.created_at.strftime('%d %B %Y') }}</p>
+
+        <div class="profile-stats">
+            <div class="stat">
+                <span class="stat-value">{{ stats.total_conversations }}</span>
+                <span class="stat-label">Discussions</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ stats.active_conversations }}</span>
+                <span class="stat-label">Actives</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ stats.total_messages }}</span>
+                <span class="stat-label">Messages</span>
+            </div>
+        </div>
+
+        <a href="{{ url_for('auth.logout') }}" class="btn-danger">Se déconnecter</a>
+    </div>
+</div>
+{% endblock %}

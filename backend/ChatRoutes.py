@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, Response, stream_with_context
 from flask_login import login_required, current_user
 from models import db, Conversation, Message
-from OllamaService import ollama_service
+from ollama_service import ollama_service
 from datetime import datetime
 import json
 

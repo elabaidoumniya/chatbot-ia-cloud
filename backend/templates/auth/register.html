@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Inscription — NeuralChat{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="brand-logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="var(--accent)" stroke-width="2"/>
+                    <path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="12" cy="20" r="2.5" fill="var(--accent)"/>
+                    <circle cx="28" cy="20" r="2.5" fill="var(--accent)"/>
+                </svg>
+                <span>NeuralChat</span>
+            </div>
+            <h1>Commencez<br><em>maintenant.</em></h1>
+            <p>Créez votre compte gratuit et accédez à tous vos modèles IA locaux.</p>
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-card">
+            <h2>Créer un compte</h2>
+            <p class="auth-subtitle">Rejoignez NeuralChat en quelques secondes.</p>
+
+            <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label>{{ form.username.label.text }}</label>
+                    {{ form.username(class="form-input", placeholder="votre_pseudo") }}
+                    {% for err in form.username.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-input", placeholder="vous@exemple.com") }}
+                    {% for err in form.email.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.password.label.text }}</label>
+                    {{ form.password(class="form-input", placeholder="Au moins 6 caractères") }}
+                    {% for err in form.password.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.confirm_password.label.text }}</label>
+                    {{ form.confirm_password(class="form-input", placeholder="Répétez le mot de passe") }}
+                    {% for err in form.confirm_password.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                </div>
+                <button type="submit" class="btn-primary btn-full">Créer mon compte</button>
+            </form>
+
+            <p class="auth-link">Déjà inscrit ? <a href="{{ url_for('auth.login') }}">Se connecter</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

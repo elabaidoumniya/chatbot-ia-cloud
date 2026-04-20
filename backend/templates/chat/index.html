@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}NeuralChat — IA Locale{% endblock %}
+{% block body_class %}chat-page{% endblock %}
+
+{% block content %}
+<div class="chat-layout">
+
+    <!-- ── SIDEBAR ────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-logo">
+                <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="var(--accent)" stroke-width="2"/>
+                    <path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="12" cy="20" r="2.5" fill="var(--accent)"/>
+                    <circle cx="28" cy="20" r="2.5" fill="var(--accent)"/>
+                </svg>
+                <span>NeuralChat</span>
+            </div>
+            <button class="icon-btn" id="sidebarToggle" title="Fermer">✕</button>
+        </div>
+
+        <button class="btn-new-chat" id="btnNewChat">
+            <span>+</span> Nouvelle discussion
+        </button>
+
+        <div class="search-box">
+            <input type="text" id="searchConvs" placeholder="Rechercher…" autocomplete="off">
+        </div>
+
+        <div class="sidebar-section">
+            <span class="section-label">Discussions récentes</span>
+        </div>
+
+        <nav class="conv-list" id="convList">
+            {% for conv in conversations %}
+            <div class="conv-item {% if loop.first %}active{% endif %}"
+                 data-id="{{ conv.id }}"
+                 data-title="{{ conv.title }}"
+                 onclick="loadConversation({{ conv.id }})">
+                <div class="conv-title">{{ conv.title }}</div>
+                <div class="conv-meta">{{ conv.updated_at.strftime('%d/%m') if conv.updated_at }}</div>
+                <div class="conv-actions">
+                    <button class="icon-btn-sm" onclick="event.stopPropagation(); renameConversation({{ conv.id }}, this)" title="Renommer">✎</button>
+                    <button class="icon-btn-sm danger" onclick="event.stopPropagation(); deleteConversation({{ conv.id }}, this)" title="Supprimer">✕</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not conversations %}
+            <div class="conv-empty">Aucune discussion. Commencez maintenant !</div>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.profile') }}" class="user-info">
+                <div class="profile-avatar" style="background: {{ current_user.avatar_color }}">
+                    {{ current_user.username[0].upper() }}
+                </div>
+                <div class="user-details">
+                    <span class="user-name">{{ current_user.username }}</span>
+                    <span class="user-email">{{ current_user.email }}</span>
+                </div>
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="icon-btn" title="Déconnexion">⎋</a>
+        </div>
+    </aside>
+
+    <!-- ── MAIN CHAT AREA ─────────────────────────────── -->
+    <main class="chat-main" id="chatMain">
+
+        <!-- Top bar -->
+        <header class="chat-header">
+            <button class="icon-btn" id="sidebarOpen" onclick="toggleSidebar()">☰</button>
+            <div class="header-info">
+                <span class="current-conv-title" id="currentTitle">
+                    {% if conversations %}{{ conversations[0].title }}{% else %}Nouvelle discussion{% endif %}
+                </span>
+                <span class="ollama-status {% if ollama_ok %}online{% else %}offline{% endif %}" id="ollamaStatus">
+                    {% if ollama_ok %}● En ligne{% else %}● Hors ligne{% endif %}
+                </span>
+            </div>
+            <div class="header-actions">
+                <select class="model-select" id="modelSelect">
+                    {% if models %}
+                        {% for m in models %}
+                        <option value="{{ m }}">{{ m }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="llama3.2">llama3.2</option>
+                    {% endif %}
+                </select>
+            </div>
+        </header>
+
+        <!-- Messages area -->
+        <div class="messages-area" id="messagesArea">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-icon">
+                    <svg width="64" height="64" viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 2"/>
+                        <path d="M12 20 Q16 12 20 20 Q24 28 28 20" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="12" cy="20" r="2.5" fill="var(--accent)"/>
+                        <circle cx="28" cy="20" r="2.5" fill="var(--accent)"/>
+                    </svg>
+                </div>
+                <h2>Bonjour, {{ current_user.username }} 👋</h2>
+                <p>Commencez une nouvelle discussion ou sélectionnez-en une existante.</p>
+                <div class="quick-prompts">
+                    <button onclick="quickPrompt('Explique-moi le machine learning simplement')">🧠 C'est quoi le ML ?</button>
+                    <button onclick="quickPrompt('Écris un script Python pour trier une liste')">🐍 Script Python</button>
+                    <button onclick="quickPrompt('Quels sont les meilleurs conseils pour apprendre à coder ?')">📚 Apprendre à coder</button>
+                    <button onclick="quickPrompt('Rédige un email professionnel pour demander une réunion')">✉️ Email professionnel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="input-area">
+            <div class="input-container">
+                <textarea
+                    id="messageInput"
+                    placeholder="Écrivez votre message… (Entrée pour envoyer, Maj+Entrée pour nouvelle ligne)"
+                    rows="1"
+                    autofocus
+                ></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Envoyer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-hint">
+                <span id="currentConvId" style="display:none"></span>
+                NeuralChat utilise vos modèles Ollama locaux — vos données restent sur votre machine.
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

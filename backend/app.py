@@ -1,17 +1,16 @@
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from Config import config
+from Config import Config
 from models import db, bcrypt, User
-from OllamaService import ollama_service
-
+from ollama_service import ollama_service
 migrate = Migrate()
 login_manager = LoginManager()
 
 
 def create_app(config_name='default'):
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    app.config.from_object(Config)
 
     # Extensions
     db.init_app(app)
@@ -30,8 +29,8 @@ def create_app(config_name='default'):
         return User.query.get(int(user_id))
 
     # Blueprints
-    from backend import auth_bp
-    from backend import chat_bp
+    from AuthRoutes import auth_bp
+    from ChatRoutes import chat_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(chat_bp, url_prefix='')
@@ -50,4 +49,4 @@ def create_app(config_name='default'):
 
 if __name__ == '__main__':
     app = create_app('development')
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=3000)
